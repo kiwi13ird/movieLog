@@ -41,7 +41,7 @@ class StartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               const Text(
-                '영화의 순간을 기록해보세요',
+                '영화의 순간을 기록하세요',
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
