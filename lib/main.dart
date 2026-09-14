@@ -41,7 +41,7 @@ class StartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               const Text(
-                '영화의 순간을 기록해보세요',
+                '영화의 순간을 기록하세요',
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -89,17 +89,19 @@ void practiceDart() {
   final movies = <Movie>[
     const Movie(id:1, title: '스파이더맨'),
     const Movie(id:2, title: "오디세이"),
-    const Movie(id: 3, title :"라라랜드"),
+    const Movie(id:3, title :"라라랜드"),
   ];
 
   for (final movie in movies){
     debugPrint(movie.title);
   }
 
-  String? nickname;
-
-  final displayName = 
-    nickname?.trim().isNotEmpty == true ? nickname! : "이름 없음";
-
+  final displayName = getDisplayName(null);
   debugPrint(displayName);
+}
+
+String getDisplayName(String? nickname) {
+  return nickname?.trim().isNotEmpty == true
+      ? nickname!
+      : '이름 없음';
 }
