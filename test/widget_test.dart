@@ -1,30 +1,44 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:movielog/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('유효한 회원가입 정보일 때만 버튼이 활성화된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    FilledButton button() =>
+        tester.widget<FilledButton>(find.byKey(const Key('signUpButton')));
+    expect(button().onPressed, isNull);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.enterText(find.byKey(const Key('nicknameField')), '키위');
+    await tester.enterText(
+      find.byKey(const Key('emailField')),
+      'kiwi@movielog.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('passwordField')),
+      'password123',
+    );
+    await tester.ensureVisible(find.byKey(const Key('termsCheckbox')));
+    await tester.tap(find.byKey(const Key('termsCheckbox')));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(button().onPressed, isNotNull);
+  });
+
+  testWidgets('잘못된 입력에 한국어 오류 메시지를 표시한다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+
+    await tester.enterText(find.byKey(const Key('nicknameField')), '키');
+    await tester.enterText(
+      find.byKey(const Key('emailField')),
+      'invalid-email',
+    );
+    await tester.enterText(find.byKey(const Key('passwordField')), '1234');
+    await tester.pump();
+
+    expect(find.text('닉네임은 두 글자 이상 입력해 주세요.'), findsOneWidget);
+    expect(find.text('올바른 이메일 형식으로 입력해 주세요.'), findsOneWidget);
+    expect(find.text('비밀번호는 8자 이상 입력해 주세요.'), findsOneWidget);
   });
 }
