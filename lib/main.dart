@@ -1,107 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  practiceDart();
-  runApp(const MovieLogApp());
-}
+import 'screens/home_screen.dart';
+import 'screens/movie_detail_screen.dart';
+import 'screens/movie_list_screen.dart';
+import 'screens/my_page_screen.dart';
+import 'screens/sign_up_screen.dart';
+import 'screens/start_screen.dart';
+import 'widgets/main_screen.dart';
 
-class MovieLogApp extends StatelessWidget {
-  const MovieLogApp({super.key});
+void main() => runApp(const MovieLogApp());
+
+class MovieLogApp extends StatefulWidget {
+  const MovieLogApp({this.initialLocation = '/', super.key});
+
+  final String initialLocation;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'MovieLog',
-      theme: ThemeData(
-        useMaterial3: true,
+  State<MovieLogApp> createState() => _MovieLogAppState();
+}
+
+class _MovieLogAppState extends State<MovieLogApp> {
+  late final GoRouter _router = GoRouter(
+    initialLocation: widget.initialLocation,
+    routes: [
+      GoRoute(
+        path: '/',
+        name: 'start',
+        builder: (context, state) => const StartScreen(),
       ),
-      home: const StartScreen(),
-    );
-  }
-}
-
-class StartScreen extends StatelessWidget {
-  const StartScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.movie_outlined,
-                size: 72,
-                semanticLabel: 'MovieLog 로고',
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                '영화의 순간을 기록하세요',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                '보고 싶은 영화부터 나만의 평점까지 한곳에서 관리해요',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    debugPrint('시작하기 버튼을 눌렀습니다.');
-                  },
-                  child: const Text('시작하기'),
+      GoRoute(
+        path: '/signup',
+        name: 'signup',
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      ShellRoute(
+        builder: (context, state, child) =>
+            MainScreen(location: state.uri.path, child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            name: 'home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/movies',
+            name: 'movies',
+            builder: (context, state) => const MovieListScreen(),
+            routes: [
+              GoRoute(
+                path: ':movieId',
+                name: 'movieDetail',
+                builder: (context, state) => MovieDetailScreen(
+                  movieId: state.pathParameters['movieId']!,
                 ),
               ),
             ],
+          ),
+          GoRoute(
+            path: '/my',
+            name: 'myPage',
+            builder: (context, state) => const MyPageScreen(),
+          ),
+        ],
+      ),
+    ],
+  );
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const purple = Color(0xFF6C5CE7);
+    final roundedBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: Color(0xFFE4E1EC)),
+    );
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'MovieLog',
+      routerConfig: _router,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: purple),
+        scaffoldBackgroundColor: const Color(0xFFF8F7FC),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 18,
+          ),
+          border: roundedBorder,
+          enabledBorder: roundedBorder,
+          focusedBorder: roundedBorder.copyWith(
+            borderSide: const BorderSide(color: purple, width: 2),
+          ),
+          errorBorder: roundedBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFE5484D)),
+          ),
+          focusedErrorBorder: roundedBorder.copyWith(
+            borderSide: const BorderSide(color: Color(0xFFE5484D), width: 2),
           ),
         ),
       ),
     );
   }
-}
-
-class Movie {
-  const Movie({
-    required this.id,
-    required this.title,
-  });
-  final int id;
-  final String title;
-}
-
-void practiceDart() {
-  final movies = <Movie>[
-    const Movie(id:1, title: '스파이더맨'),
-    const Movie(id:2, title: "오디세이"),
-    const Movie(id:3, title :"라라랜드"),
-  ];
-
-  for (final movie in movies){
-    debugPrint(movie.title);
-  }
-
-  final displayName = getDisplayName(null);
-  debugPrint(displayName);
-}
-
-String getDisplayName(String? nickname) {
-  return nickname?.trim().isNotEmpty == true
-      ? nickname!
-      : '이름 없음';
 }
