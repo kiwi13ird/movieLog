@@ -8,9 +8,10 @@ import '../widgets/movie_poster.dart';
 import '../widgets/movie_rating_input.dart';
 
 class MovieDetailScreen extends StatefulWidget {
-  const MovieDetailScreen({required this.movieId, super.key});
+  const MovieDetailScreen({required this.movieId, this.movie, super.key});
 
   final String movieId;
+  final Movie? movie;
 
   @override
   State<MovieDetailScreen> createState() => _MovieDetailScreenState();
@@ -37,6 +38,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: Text('${movie.title} 평점'),
+          semanticLabel: 'movieId: ${movie.id}',
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -70,7 +72,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final movie = findMovieById(widget.movieId);
+    final movie = widget.movie ?? findMovieById(widget.movieId);
     if (movie == null) {
       return Scaffold(
         appBar: AppBar(leading: BackButton(onPressed: () => context.pop())),
@@ -117,7 +119,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 KeyedSubtree(
                   key: const Key('averageRatingIndicator'),
                   child: RatingBarIndicator(
-                    rating: 4.5,
+                    rating: movie.voteAverage / 2,
                     itemCount: 5,
                     itemSize: 28,
                     unratedColor: const Color(0xFFE1DFE8),
@@ -128,8 +130,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  '4.5',
+                Text(
+                  (movie.voteAverage / 2).toStringAsFixed(1),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                 ),
               ],
@@ -146,12 +148,12 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             ),
           ),
           const SizedBox(height: 22),
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Text(
-                '이 화면은 공통 Mock Movie 데이터의 ID를 기준으로 영화 정보를 표시합니다.',
-                style: TextStyle(height: 1.55),
+                movie.overview.isEmpty ? '줄거리 정보가 없습니다.' : movie.overview,
+                style: const TextStyle(height: 1.55),
               ),
             ),
           ),

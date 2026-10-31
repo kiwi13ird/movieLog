@@ -5,6 +5,9 @@ class Movie {
     required this.genre,
     required this.year,
     required this.posterAsset,
+    this.posterUrl,
+    this.overview = '',
+    this.voteAverage = 0,
   });
 
   final String id;
@@ -12,6 +15,9 @@ class Movie {
   final String genre;
   final int year;
   final String posterAsset;
+  final String? posterUrl;
+  final String overview;
+  final double voteAverage;
 }
 
 const mockMovies = <Movie>[

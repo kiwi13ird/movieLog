@@ -1,257 +1,241 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-import '../models/movie.dart';
-import '../widgets/genre_chip.dart';
+import '../view_models/movie_view_models.dart';
 import '../widgets/movie_card.dart';
 import '../widgets/movie_list_states.dart';
-import '../services/fake_movie_service.dart';
-import '../services/genre_preference.dart';
 
 class MovieListScreen extends StatefulWidget {
   const MovieListScreen({super.key});
-
   @override
   State<MovieListScreen> createState() => _MovieListScreenState();
 }
 
 class _MovieListScreenState extends State<MovieListScreen> {
-  String _selectedGenre = '전체';
-
-  final _service = const FakeMovieService();
-  final _preference = GenrePreference();
-  late Future<List<Movie>> _moviesFuture;
-  bool _restoringGenre = true;
-  Future<void> _pendingSave = Future<void>.value();
-
+  MovieListViewModel? _vm;
+  int _seenFailure = 0;
+  bool _dialogOpen = false;
   @override
-  void initState() {
-    super.initState();
-    _moviesFuture = _loadInitial();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final vm = context.read<MovieListViewModel>();
+    if (identical(vm, _vm)) return;
+    _vm?.removeListener(_onChange);
+    _vm = vm;
+    _seenFailure = vm.failureVersion;
+    vm.addListener(_onChange);
   }
 
-  Future<List<Movie>> _loadInitial() async {
-    final results = await Future.wait<Object>([
-      _loadMovies(MovieLoadMode.success),
-      _restoreGenre(),
-    ]);
-    return results.first as List<Movie>;
-  }
-
-  Future<String> _restoreGenre() async {
-    try {
-      final genre = await _preference.read();
-      if (mounted && ['전체', '로맨스', '드라마', 'SF', '액션'].contains(genre)) {
-        setState(() => _selectedGenre = genre);
-      }
-      return genre;
-    } catch (_) {
-      return '전체';
-    } finally {
-      if (mounted) setState(() => _restoringGenre = false);
-    }
-  }
-
-  Future<List<Movie>> _loadMovies(MovieLoadMode mode) async {
-    try {
-      return await _service
-          .fetchMovies(mode: mode)
-          .timeout(const Duration(seconds: 3));
-    } catch (error, stackTrace) {
-      debugPrint('영화 로드 실패: $error');
-      debugPrintStack(stackTrace: stackTrace);
-      rethrow;
-    } finally {
-      debugPrint('영화 로드 시도 종료');
-    }
-  }
-
-  Future<void> _reload([MovieLoadMode mode = MovieLoadMode.success]) async {
-    final future = _loadMovies(mode);
-    setState(() {
-      _moviesFuture = future;
-    });
-    try {
-      await future;
-    } catch (_) {
-      // FutureBuilder에서 사용자 안내와 재시도를 제공한다.
-    }
-  }
-
-  void _selectGenre(String genre) {
-    setState(() => _selectedGenre = genre);
-    _pendingSave = _pendingSave.then((_) async {
-      try {
-        await _preference.save(genre);
-      } catch (_) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('장르를 저장하지 못했어요. 다시 선택해 주세요.')),
-        );
-      }
+  void _onChange() {
+    final vm = _vm!;
+    if (vm.failureVersion == _seenFailure) return;
+    _seenFailure = vm.failureVersion;
+    if (_dialogOpen || vm.movies.isEmpty) return;
+    _dialogOpen = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final retry = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('영화를 불러오지 못했어요'),
+          content: const Text('최근에 불러온 목록은 유지했어요. 연결을 확인하고 다시 시도해 주세요.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('재시도'),
+            ),
+          ],
+        ),
+      );
+      _dialogOpen = false;
+      if (mounted && retry == true) await vm.load();
     });
   }
 
-  void _showOptions() {
-    showModalBottomSheet<void>(
+  Future<void> _showGenres(MovieListViewModel vm) async {
+    final draft = {...?vm.selectedGenreIds};
+    final result = await showModalBottomSheet<List<int>>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (sheetContext) => SafeArea(
-        child: SingleChildScrollView(
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  '영화 보기 옵션',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 16),
-                const ListTile(
-                  leading: Icon(Icons.sort_rounded),
-                  title: Text('최신작순'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const ListTile(
-                  leading: Icon(Icons.star_outline_rounded),
-                  title: Text('평점순'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const Divider(),
-                const Text('인증용 Mock 상태'),
-                for (final entry in const {
-                  MovieLoadMode.success: 'Success 확인',
-                  MovieLoadMode.empty: 'Empty 확인',
-                  MovieLoadMode.failure: 'Error 확인',
-                  MovieLoadMode.timeout: 'Timeout 확인',
-                }.entries)
-                  ListTile(
-                    title: Text(entry.value),
-                    onTap: () {
-                      Navigator.of(sheetContext).pop();
-                      _reload(entry.key);
-                    },
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * .7,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          '장르 선택',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => setSheetState(draft.clear),
+                        child: const Text('전체'),
+                      ),
+                    ],
                   ),
-                FilledButton.tonal(
-                  onPressed: () => Navigator.of(sheetContext).pop(),
-                  child: const Text('닫기'),
-                ),
-              ],
+                  const Text('여러 장르를 선택할 수 있어요.'),
+                  const SizedBox(height: 16),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final genre in vm.genres)
+                            FilterChip(
+                              key: ValueKey('genre-${genre.id}'),
+                              label: Text(genre.name),
+                              selected: draft.contains(genre.id),
+                              onSelected: (selected) => setSheetState(() {
+                                if (selected) {
+                                  draft.add(genre.id);
+                                } else {
+                                  draft.remove(genre.id);
+                                }
+                              }),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton(
+                    onPressed: () =>
+                        Navigator.pop(sheetContext, draft.toList()..sort()),
+                    child: const Text('확인'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+    if (mounted && result != null) await vm.selectGenres(result);
   }
 
   @override
-  Widget build(BuildContext context) {
-    const genres = ['전체', '로맨스', '드라마', 'SF', '액션'];
-
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 18, 12, 6),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    '영화',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-                  ),
-                ),
-                IconButton(
-                  key: const Key('movieOptionsButton'),
-                  tooltip: '영화 보기 옵션',
-                  onPressed: _showOptions,
-                  icon: const Icon(Icons.tune_rounded),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 54,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-              itemCount: genres.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final genre = genres[index];
-                return GenreChip(
-                  label: genre,
-                  selected: _selectedGenre == genre,
-                  onSelected: _restoringGenre
-                      ? null
-                      : (_) => _selectGenre(genre),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<Movie>>(
-              future: _moviesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return const MovieListLoading();
-                }
-                final movies = (snapshot.data ?? const <Movie>[])
-                    .where(
-                      (movie) =>
-                          _selectedGenre == '전체' ||
-                          movie.genre == _selectedGenre,
-                    )
-                    .toList();
-                return RefreshIndicator(
-                  onRefresh: _reload,
-                  child: snapshot.hasError || movies.isEmpty
-                      ? LayoutBuilder(
-                          builder: (context, constraints) {
-                            return ListView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              children: [
-                                SizedBox(
-                                  height: constraints.maxHeight,
-                                  child: snapshot.hasError
-                                      ? MovieListError(
-                                          isTimeout:
-                                              snapshot.error
-                                                  is TimeoutException,
-                                          onRetry: () => _reload(),
-                                        )
-                                      : const MovieListEmpty(),
-                                ),
-                              ],
-                            );
-                          },
-                        )
-                      : ListView.separated(
-                          key: const Key('movieList'),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
-                          itemCount: movies.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(height: 14),
-                          itemBuilder: (context, index) {
-                            final movie = movies[index];
-                            return MovieCard(
-                              movie: movie,
-                              onTap: () => context.push('/movies/${movie.id}'),
-                            );
-                          },
-                        ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+  void dispose() {
+    _vm?.removeListener(_onChange);
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Consumer<MovieListViewModel>(
+      builder: (context, vm, child) {
+        final names = vm.genres
+            .where((g) => vm.selectedGenreIds?.contains(g.id) ?? false)
+            .map((g) => g.name)
+            .join(' · ');
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 18, 12, 6),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      '영화',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    key: const Key('movieOptionsButton'),
+                    tooltip: '장르 선택',
+                    onPressed: vm.busy || vm.genres.isEmpty
+                        ? null
+                        : () => _showGenres(vm),
+                    icon: const Icon(Icons.tune_rounded),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: Text(names.isEmpty ? '전체' : names)),
+                  Text('총 ${vm.movies.length}개'),
+                ],
+              ),
+            ),
+            if (vm.busy && vm.movies.isNotEmpty)
+              const LinearProgressIndicator(),
+            Expanded(
+              child: vm.busy && vm.movies.isEmpty
+                  ? const MovieListLoading()
+                  : vm.status == MovieLoadStatus.error
+                  ? MovieListError(onRetry: () => vm.load())
+                  : RefreshIndicator(
+                      notificationPredicate: (notification) =>
+                          !vm.busy && notification.depth == 0,
+                      onRefresh: () => vm.load(),
+                      child: vm.movies.isEmpty
+                          ? LayoutBuilder(
+                              builder: (context, constraints) => ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  SizedBox(
+                                    height: constraints.maxHeight,
+                                    child: const MovieListEmpty(),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              key: const Key('movieList'),
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                24,
+                                14,
+                                24,
+                                24,
+                              ),
+                              itemCount: vm.movies.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 14),
+                              itemBuilder: (context, index) {
+                                final movie = vm.movies[index].toMovie(
+                                  vm.genres,
+                                );
+                                return MovieCard(
+                                  movie: movie,
+                                  onTap: () => context.push(
+                                    '/movies/${movie.id}',
+                                    extra: movie,
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+            ),
+          ],
+        );
+      },
+    ),
+  );
 }
