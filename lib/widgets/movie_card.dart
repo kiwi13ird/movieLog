@@ -41,17 +41,17 @@ class MovieCard extends StatelessWidget {
                       style: const TextStyle(color: Color(0xFF6F6B78)),
                     ),
                     const SizedBox(height: 16),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star_rounded,
                           color: Color(0xFFFFB800),
                           size: 19,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
-                          '4.5',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                          (movie.voteAverage / 2).toStringAsFixed(1),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                       ],
                     ),

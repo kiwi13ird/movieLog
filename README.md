@@ -28,3 +28,11 @@ samples, guidance on mobile development, and a full API reference.
 - `flutter analyze`, `flutter test`로 검증합니다.
 
 인증 제출 시 Loading·Empty·Success 캡처, Error 재시도 및 앱 재실행 장르 복원 영상, 분석 결과와 PR 링크를 첨부하세요.
+
+## 5주차 TMDB + Challenge
+
+현재 앱의 홈/영화 탭은 Provider 기반 TMDB 연동을 사용합니다.
+기존 4주차 Mock 메뉴/단일 장르 로컬 필터 대신 서버 조회와 다중 장르 선택을 사용합니다.
+`.env.example`을 참고해 `.env`를 설정하세요. 토큰은 커밋하지 않습니다.
+
+실행·촬영·제출 방법: [5주차 제출 안내](docs/week05-submission.md)

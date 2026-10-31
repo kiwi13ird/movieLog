@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-import '../models/movie.dart';
+import '../view_models/movie_view_models.dart';
 import '../widgets/movie_card.dart';
+import '../widgets/movie_list_states.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView(
+  Widget build(BuildContext context) => SafeArea(
+    child: Consumer<MovieHomeViewModel>(
+      builder: (context, vm, child) => ListView(
         padding: const EdgeInsets.all(24),
         children: [
           const Text(
@@ -22,17 +23,17 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            '추천 영화를 확인해 보세요.',
-            style: TextStyle(color: Color(0xFF6F6B78), fontSize: 16),
-          ),
+          const Text('인기 영화를 확인해 보세요.'),
           const SizedBox(height: 26),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '오늘의 추천',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              Text(
+                '인기 영화 ${vm.movies.length}개',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               TextButton(
                 onPressed: () => context.go('/movies'),
@@ -40,20 +41,29 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          ...mockMovies
-              .take(3)
-              .map(
-                (movie) => Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: MovieCard(
-                    movie: movie,
-                    onTap: () => context.push('/movies/${movie.id}'),
-                  ),
+          if (vm.status == MovieLoadStatus.loading)
+            const SizedBox(height: 220, child: MovieListLoading()),
+          if (vm.status == MovieLoadStatus.error)
+            MovieListError(onRetry: () => vm.load()),
+          if (vm.status == MovieLoadStatus.empty)
+            const SizedBox(height: 220, child: MovieListEmpty()),
+          for (final dto in vm.movies)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: MovieCard(
+                movie: dto.toMovie(vm.genres),
+                onTap: () => context.push(
+                  '/movies/${dto.id}',
+                  extra: dto.toMovie(vm.genres),
                 ),
               ),
+            ),
+          const Text(
+            'This product uses the TMDB API but is not endorsed or certified by TMDB.',
+            style: TextStyle(fontSize: 11, color: Colors.grey),
+          ),
         ],
       ),
-    );
-  }
+    ),
+  );
 }

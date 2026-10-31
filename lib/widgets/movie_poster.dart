@@ -36,11 +36,22 @@ class MoviePoster extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Icon(
-        Icons.movie_creation_outlined,
-        color: Colors.white,
-        size: 38,
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: movie.posterUrl == null
+          ? const Icon(
+              Icons.movie_creation_outlined,
+              color: Colors.white,
+              size: 38,
+            )
+          : Image.network(
+              movie.posterUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.broken_image_outlined,
+                color: Colors.white,
+                size: 38,
+              ),
+            ),
     );
   }
 }
