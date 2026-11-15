@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/core/network/movie_log_client.dart';
 import 'package:movielog/data/models/rating_dto.dart';
 import 'package:movielog/data/models/tmdb_movie_dto.dart';
-import 'package:movielog/data/services/member_check_service.dart';
+import 'package:movielog/data/services/sign_up_service.dart';
 import 'package:movielog/data/services/rating_api_service.dart';
 
 class RecordingAdapter implements HttpClientAdapter {
@@ -44,11 +44,11 @@ class RecordingAdapter implements HttpClientAdapter {
 }
 
 void main() {
-  test('v5 services use raw bodies, encoded path segments and no TMDB authorization', () async {
+  test('v6 services use raw bodies, encoded path segments and no TMDB authorization', () async {
     final dio = createMovieLogClient();
     final adapter = RecordingAdapter();
     dio.httpClientAdapter = adapter;
-    final service = MemberCheckService(dio);
+    final service = SignUpService(dio);
     expect(await service.checkNickname(' 수현 '), isFalse);
     expect(adapter.requests.last.uri.pathSegments.last, '수현');
     expect(await service.checkEmail(' new+tag@example.com '), isFalse);
@@ -59,7 +59,7 @@ void main() {
     expect(ratings.single.updatedAt.isUtc, isTrue);
     expect(
       adapter.requests.last.uri.toString(),
-      'https://workbook.devnoco.com/v5/members/1/ratings',
+      'https://workbook.devnoco.com/v6/members/1/ratings',
     );
     expect(
       adapter.requests.every(

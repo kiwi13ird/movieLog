@@ -1,3 +1,6 @@
+import '../data/models/sign_up_models.dart';
+import '../view_models/learning_member_session.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -33,197 +36,222 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (!context.read<SignUpViewModel>().canSubmit ||
-        !(_formKey.currentState?.validate() ?? false)) {
-      return;
-    }
+  Future<void> _submit() async {
+    final vm = context.read<SignUpViewModel>();
+    if (!vm.canSubmit || !(_formKey.currentState?.validate() ?? false)) return;
     FocusScope.of(context).unfocus();
-    context.go('/home');
+    await vm.submit(
+      CreateMemberRequest(
+        email: _emailController.text,
+        password: _passwordController.text,
+        nickname: _nicknameController.text,
+      ),
+    );
+    if (!mounted) return;
+    if (vm.submitStatus == SubmitStatus.success && vm.createdMember != null) {
+      context.read<LearningMemberSession>().setMember(vm.createdMember!);
+      _passwordController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('회원가입 완료 · 학습용 회원 #${vm.createdMemberId}')),
+      );
+      context.go('/movies');
+    } else if (vm.snackbarMessage != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(vm.snackbarMessage!)));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SignUpViewModel>(
-      builder: (context, vm, child) => Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const _SignUpHeader(),
-                      const SizedBox(height: 32),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context, vm, child) => PopScope(
+        canPop: !vm.isSubmitting,
+        child: Scaffold(
+          body: AbsorbPointer(
+            absorbing: vm.isSubmitting,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 560),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(
-                            child: MovieLogTextFormField(
-                              key: const Key('nicknameField'),
-                              controller: _nicknameController,
-                              focusNode: _nicknameFocusNode,
-                              label: '닉네임',
-                              hint: '2~12자',
-                              icon: Icons.person_outline,
-                              textInputAction: TextInputAction.next,
-                              validator: SignUpViewModel.nicknameValidation,
-                              errorText: vm.nicknameErrorText,
-                              suffixIcon:
-                                  vm.nicknameCheckStatus ==
-                                      CheckStatus.available
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.green,
-                                    )
-                                  : null,
-                              onChanged: vm.onNicknameChanged,
-                              onFieldSubmitted: (_) =>
-                                  _emailFocusNode.requestFocus(),
-                            ),
+                          const _SignUpHeader(),
+                          const SizedBox(height: 32),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: MovieLogTextFormField(
+                                  key: const Key('nicknameField'),
+                                  controller: _nicknameController,
+                                  focusNode: _nicknameFocusNode,
+                                  label: '닉네임',
+                                  hint: '2~12자',
+                                  icon: Icons.person_outline,
+                                  textInputAction: TextInputAction.next,
+                                  validator: SignUpViewModel.nicknameValidation,
+                                  errorText: vm.nicknameErrorText,
+                                  suffixIcon:
+                                      vm.nicknameCheckStatus ==
+                                          CheckStatus.available
+                                      ? const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                        )
+                                      : null,
+                                  onChanged: vm.onNicknameChanged,
+                                  onFieldSubmitted: (_) =>
+                                      _emailFocusNode.requestFocus(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: MovieLogButton(
+                                  key: const Key('checkNicknameButton'),
+                                  label: '중복 확인',
+                                  isLoading:
+                                      vm.nicknameCheckStatus ==
+                                      CheckStatus.checking,
+                                  onPressed: vm.canCheckNickname
+                                      ? () => vm.checkNickname(
+                                          _nicknameController.text,
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: MovieLogButton(
-                              key: const Key('checkNicknameButton'),
-                              label: '중복 확인',
-                              isLoading:
-                                  vm.nicknameCheckStatus ==
-                                  CheckStatus.checking,
-                              onPressed: vm.canCheckNickname
-                                  ? () => vm.checkNickname(
-                                      _nicknameController.text,
-                                    )
-                                  : null,
+                          if (vm.nicknameCheckStatus == CheckStatus.available)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Text(
+                                '사용할 수 있는 닉네임입니다.',
+                                style: TextStyle(
+                                  color: Color(0xFF18745B),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 18),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: MovieLogTextFormField(
+                                  key: const Key('emailField'),
+                                  controller: _emailController,
+                                  focusNode: _emailFocusNode,
+                                  label: '이메일',
+                                  hint: '이메일 주소',
+                                  icon: Icons.mail_outline,
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.next,
+                                  validator: SignUpViewModel.emailValidation,
+                                  errorText: vm.emailErrorText,
+                                  suffixIcon:
+                                      vm.emailCheckStatus ==
+                                          CheckStatus.available
+                                      ? const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                        )
+                                      : null,
+                                  onChanged: vm.onEmailChanged,
+                                  onFieldSubmitted: (_) =>
+                                      _passwordFocusNode.requestFocus(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: MovieLogButton(
+                                  key: const Key('checkEmailButton'),
+                                  label: '중복 확인',
+                                  isLoading:
+                                      vm.emailCheckStatus ==
+                                      CheckStatus.checking,
+                                  onPressed: vm.canCheckEmail
+                                      ? () =>
+                                            vm.checkEmail(_emailController.text)
+                                      : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (vm.emailCheckStatus == CheckStatus.available)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Text(
+                                '사용할 수 있는 이메일입니다.',
+                                style: TextStyle(
+                                  color: Color(0xFF18745B),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 18),
+                          MovieLogTextFormField(
+                            key: const Key('passwordField'),
+                            controller: _passwordController,
+                            focusNode: _passwordFocusNode,
+                            label: '비밀번호',
+                            hint: '대문자·소문자·숫자·특수문자 포함',
+                            errorText: vm.passwordErrorText,
+                            icon: Icons.lock_outline,
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            suffixIcon: IconButton(
+                              tooltip: _obscurePassword
+                                  ? '비밀번호 표시'
+                                  : '비밀번호 숨기기',
+                              onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                              ),
+                            ),
+                            validator: SignUpViewModel.passwordValidation,
+                            onChanged: vm.onPasswordChanged,
+                            onFieldSubmitted: (_) =>
+                                FocusScope.of(context).unfocus(),
+                          ),
+                          const SizedBox(height: 14),
+                          _TermsAgreement(
+                            value: vm.agreedToTerms,
+                            onChanged: (value) =>
+                                vm.onTermsChanged(value ?? false),
+                          ),
+                          const SizedBox(height: 24),
+                          MovieLogButton(
+                            key: const Key('signUpButton'),
+                            label: '가입하기',
+                            isLoading: vm.isSubmitting,
+                            width: double.infinity,
+                            onPressed: vm.canSubmit ? _submit : null,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            '학습용 계정을 생성합니다. 회원 상태는 앱 재시작 시 초기화됩니다.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF7B7786),
+                              fontSize: 12,
                             ),
                           ),
                         ],
                       ),
-                      if (vm.nicknameCheckStatus == CheckStatus.available)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text(
-                            '사용할 수 있는 닉네임입니다.',
-                            style: TextStyle(
-                              color: Color(0xFF18745B),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 18),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: MovieLogTextFormField(
-                              key: const Key('emailField'),
-                              controller: _emailController,
-                              focusNode: _emailFocusNode,
-                              label: '이메일',
-                              hint: '이메일 주소',
-                              icon: Icons.mail_outline,
-                              keyboardType: TextInputType.emailAddress,
-                              textInputAction: TextInputAction.next,
-                              validator: SignUpViewModel.emailValidation,
-                              errorText: vm.emailErrorText,
-                              suffixIcon:
-                                  vm.emailCheckStatus == CheckStatus.available
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.green,
-                                    )
-                                  : null,
-                              onChanged: vm.onEmailChanged,
-                              onFieldSubmitted: (_) =>
-                                  _passwordFocusNode.requestFocus(),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: MovieLogButton(
-                              key: const Key('checkEmailButton'),
-                              label: '중복 확인',
-                              isLoading:
-                                  vm.emailCheckStatus == CheckStatus.checking,
-                              onPressed: vm.canCheckEmail
-                                  ? () => vm.checkEmail(_emailController.text)
-                                  : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (vm.emailCheckStatus == CheckStatus.available)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text(
-                            '사용할 수 있는 이메일입니다.',
-                            style: TextStyle(
-                              color: Color(0xFF18745B),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 18),
-                      MovieLogTextFormField(
-                        key: const Key('passwordField'),
-                        controller: _passwordController,
-                        focusNode: _passwordFocusNode,
-                        label: '비밀번호',
-                        hint: '8자 이상 입력해 주세요',
-                        icon: Icons.lock_outline,
-                        obscureText: _obscurePassword,
-                        textInputAction: TextInputAction.done,
-                        suffixIcon: IconButton(
-                          tooltip: _obscurePassword ? '비밀번호 표시' : '비밀번호 숨기기',
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '비밀번호를 입력해 주세요.';
-                          }
-                          if (value.length < 8) return '비밀번호는 8자 이상 입력해 주세요.';
-                          return null;
-                        },
-                        onChanged: vm.onPasswordChanged,
-                        onFieldSubmitted: (_) =>
-                            FocusScope.of(context).unfocus(),
-                      ),
-                      const SizedBox(height: 14),
-                      _TermsAgreement(
-                        value: vm.agreedToTerms,
-                        onChanged: (value) => vm.onTermsChanged(value ?? false),
-                      ),
-                      const SizedBox(height: 24),
-                      MovieLogButton(
-                        key: const Key('signUpButton'),
-                        label: '가입하기',
-                        width: double.infinity,
-                        onPressed: vm.canSubmit ? _submit : null,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        '학습용 화면입니다. 계정 생성 없이 홈으로 이동합니다.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF7B7786),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

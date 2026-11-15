@@ -44,3 +44,12 @@ samples, guidance on mobile development, and a full API reference.
 계정 생성·평점 저장 요청은 보내지 않습니다.
 
 실행·검증 모드·캡처 순서·제출 양식: [6주차 제출 안내](docs/week06-submission.md)
+
+## 현재: 7주차 v6 회원가입·평점 CRUD + Challenge
+
+현재 앱은 v6로 회원가입하고 성공한 memberId를 메모리 세션에 저장합니다.
+영화 상세에서 정수 별점·코멘트를 등록하고, 마이페이지에서 수정·단일 삭제·다중 삭제합니다.
+저장 후 GET 실패는 별도로 표시하며 조회만 재시도합니다.
+이전 4~6주차 안내는 당시 구현 기록입니다.
+
+실행·챌린지 검증 모드·촬영 순서: [7주차 제출 안내](docs/week07-submission.md)

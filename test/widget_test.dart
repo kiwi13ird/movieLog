@@ -1,3 +1,5 @@
+import 'package:movielog/view_models/learning_member_session.dart';
+import 'package:movielog/data/models/sign_up_models.dart';
 import 'package:movielog/data/services/week06_fixture_services.dart';
 import 'package:movielog/widgets/movielog_button.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +25,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('checkEmailButton')));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byKey(const Key('passwordField')),
-      'password123',
-    );
+    await tester.enterText(find.byKey(const Key('passwordField')), 'Valid123!');
     await tester.ensureVisible(find.byKey(const Key('termsCheckbox')));
     await tester.tap(find.byKey(const Key('termsCheckbox')));
     await tester.pump();
@@ -36,7 +35,8 @@ void main() {
     await tester.pumpWidget(
       MovieLogApp(
         service: FixtureMovieService('posters'),
-        memberService: FixtureMemberCheckService(delay: Duration.zero),
+        memberService: FixtureSignUpService(delay: Duration.zero),
+        ratingService: FixtureRatingApiService('success', delay: Duration.zero),
       ),
     );
 
@@ -48,7 +48,7 @@ void main() {
     await enterValidSignUp(tester);
     await tester.tap(find.byKey(const Key('signUpButton')));
     await tester.pumpAndSettle();
-    expect(find.text('오늘은 어떤 영화를\n기록해 볼까요?'), findsOneWidget);
+    expect(find.byKey(const Key('movieList')), findsOneWidget);
 
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
@@ -61,7 +61,8 @@ void main() {
       MovieLogApp(
         initialLocation: '/signup',
         service: FixtureMovieService('posters'),
-        memberService: FixtureMemberCheckService(delay: Duration.zero),
+        memberService: FixtureSignUpService(delay: Duration.zero),
+        ratingService: FixtureRatingApiService('success', delay: Duration.zero),
       ),
     );
 
@@ -77,7 +78,8 @@ void main() {
       MovieLogApp(
         initialLocation: '/home',
         service: FixtureMovieService('posters'),
-        memberService: FixtureMemberCheckService(delay: Duration.zero),
+        memberService: FixtureSignUpService(delay: Duration.zero),
+        ratingService: FixtureRatingApiService('success', delay: Duration.zero),
       ),
     );
 
@@ -113,8 +115,17 @@ void main() {
     await tester.pumpWidget(
       MovieLogApp(
         initialLocation: '/movies',
+        session: LearningMemberSession()
+          ..setMember(
+            const SignUpResult(
+              memberId: 9001,
+              email: 'fixture@example.com',
+              nickname: '검증회원',
+            ),
+          ),
         service: FixtureMovieService('posters'),
-        memberService: FixtureMemberCheckService(delay: Duration.zero),
+        memberService: FixtureSignUpService(delay: Duration.zero),
+        ratingService: FixtureRatingApiService('success', delay: Duration.zero),
       ),
     );
     await tester.pump(const Duration(seconds: 1));

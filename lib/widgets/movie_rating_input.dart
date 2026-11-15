@@ -5,10 +5,12 @@ class MovieRatingInput extends StatelessWidget {
   const MovieRatingInput({
     required this.rating,
     required this.onRatingUpdate,
+    this.enabled = true,
     super.key,
   });
 
   final double rating;
+  final bool enabled;
   final ValueChanged<double> onRatingUpdate;
 
   @override
@@ -17,8 +19,9 @@ class MovieRatingInput extends StatelessWidget {
       key: const Key('movieRatingInput'),
       child: RatingBar.builder(
         initialRating: rating,
-        minRating: 0.5,
-        allowHalfRating: true,
+        minRating: 1,
+        allowHalfRating: false,
+        ignoreGestures: !enabled,
         itemCount: 5,
         itemSize: 38,
         glow: false,

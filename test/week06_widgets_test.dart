@@ -1,3 +1,5 @@
+import 'package:movielog/view_models/learning_member_session.dart';
+import 'package:movielog/data/models/sign_up_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/main.dart';
@@ -7,20 +9,28 @@ import 'package:movielog/widgets/movielog_button.dart';
 MovieLogApp fixtureApp(
   String route, {
   String mode = 'success',
-  FixtureMemberCheckService? checks,
+  FixtureSignUpService? checks,
   Duration delay = Duration.zero,
 }) => MovieLogApp(
   key: UniqueKey(),
+  session: LearningMemberSession()
+    ..setMember(
+      const SignUpResult(
+        memberId: 9001,
+        email: 'fixture@example.com',
+        nickname: '검증회원',
+      ),
+    ),
   initialLocation: route,
   service: Week06FixtureMovieService(mode),
-  memberService: checks ?? FixtureMemberCheckService(delay: delay),
+  memberService: checks ?? FixtureSignUpService(delay: delay),
   ratingService: FixtureRatingApiService(mode, delay: delay),
 );
 void main() {
   testWidgets(
     'signup loading, duplicate error, invalidation and duplicate restoration use the field state',
     (tester) async {
-      final checks = FixtureMemberCheckService();
+      final checks = FixtureSignUpService();
       await tester.pumpWidget(fixtureApp('/signup', checks: checks));
       MovieLogButton button(String key) =>
           tester.widget<MovieLogButton>(find.byKey(Key(key)));
@@ -91,7 +101,7 @@ void main() {
       );
       await tester.enterText(
         find.byKey(const Key('passwordField')),
-        'password123',
+        'Valid123!',
       );
       await tester.ensureVisible(find.byKey(const Key('termsCheckbox')));
       await tester.tap(find.byKey(const Key('termsCheckbox')));
@@ -120,7 +130,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('myRatingsTile')));
     await tester.pumpAndSettle();
-    expect(find.text('학습용 회원(memberId 1)의 공개 평점입니다.'), findsOneWidget);
+    expect(find.text('학습용 회원 #9001의 평점 · 로그인 인증 전 단계'), findsOneWidget);
     expect(find.byKey(const Key('ratingsSuccess')), findsOneWidget);
     expect(find.text('포레스트 검프'), findsOneWidget);
     expect(find.text('null'), findsNothing);
@@ -152,7 +162,7 @@ void main() {
           expect(find.byKey(const Key('ratingsSuccess')), findsOneWidget);
           expect(find.text('영화 정보를 불러올 수 없어요'), findsWidgets);
           expect(find.text('최고의 영화!'), findsOneWidget);
-          expect(find.text('5 / 5'), findsOneWidget);
+          expect(find.text('★ 5 / 5'), findsOneWidget);
         }
       }
     },

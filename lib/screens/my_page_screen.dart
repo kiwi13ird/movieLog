@@ -1,3 +1,7 @@
+import 'package:provider/provider.dart';
+
+import '../view_models/learning_member_session.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -55,7 +59,11 @@ class MyPageScreen extends StatelessWidget {
                 key: const Key('myRatingsTile'),
                 leading: const Icon(Icons.star_outline_rounded),
                 title: const Text('내가 등록한 평점'),
-                subtitle: const Text('학습용 회원 1의 공개 데이터'),
+                subtitle: Text(
+                  context.watch<LearningMemberSession>().memberId == null
+                      ? '회원가입 후 이용할 수 있어요'
+                      : '학습용 회원 #${context.watch<LearningMemberSession>().memberId}',
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push('/my/ratings'),
               ),

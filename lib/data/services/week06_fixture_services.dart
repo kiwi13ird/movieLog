@@ -1,14 +1,18 @@
+import '../models/rating_request.dart';
+import '../models/common_response.dart';
+import '../models/sign_up_models.dart';
+
 import 'package:dio/dio.dart';
 
 import '../models/rating_dto.dart';
 import '../models/tmdb_movie_dto.dart';
-import 'member_check_service.dart';
+import 'sign_up_service.dart';
 import 'rating_api_service.dart';
 import 'fixture_movie_service.dart';
 
 /// Explicit debug/test fixtures. The app factories guard these with kDebugMode.
-class FixtureMemberCheckService extends MemberCheckService {
-  FixtureMemberCheckService({
+class FixtureSignUpService extends SignUpService {
+  FixtureSignUpService({
     this.fail = false,
     this.delay = const Duration(milliseconds: 1200),
   }) : super(Dio());
@@ -25,13 +29,26 @@ class FixtureMemberCheckService extends MemberCheckService {
     await Future<void>.delayed(delay);
     if (fail) {
       throw DioException(
-        requestOptions: RequestOptions(path: '/v5/members'),
+        requestOptions: RequestOptions(path: '/v6/members'),
         type: DioExceptionType.connectionError,
       );
     }
     return value != duplicate;
   }
 
+  @override
+  Future<CommonResponse<SignUpResult>> signUp(
+    CreateMemberRequest request,
+  ) async => CommonResponse(
+    isSuccess: true,
+    code: 'COMMON201',
+    message: 'fixture signup',
+    result: SignUpResult(
+      memberId: 9001,
+      email: request.email,
+      nickname: request.nickname,
+    ),
+  );
   @override
   Future<bool> checkNickname(String nickname) =>
       _check(nickname.trim(), '수현', nicknameRequests);
@@ -48,11 +65,28 @@ class FixtureRatingApiService extends RatingApiService {
   final String mode;
   final Duration delay;
   @override
+  Future<void> createRating({
+    required int memberId,
+    required CreateRatingRequest request,
+  }) async {}
+  @override
+  Future<void> updateRating({
+    required int memberId,
+    required int ratingId,
+    required int score,
+    String? comment,
+  }) async {}
+  @override
+  Future<void> deleteRating({
+    required int memberId,
+    required int ratingId,
+  }) async {}
+  @override
   Future<List<RatingDto>> fetchMyRatings(int memberId) async {
     await Future<void>.delayed(delay);
     if (mode == 'error') {
       throw DioException(
-        requestOptions: RequestOptions(path: '/v5/members/$memberId/ratings'),
+        requestOptions: RequestOptions(path: '/v6/members/$memberId/ratings'),
         type: DioExceptionType.connectionError,
       );
     }

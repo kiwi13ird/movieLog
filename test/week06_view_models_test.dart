@@ -4,14 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/data/models/rating_dto.dart';
 import 'package:movielog/data/models/tmdb_movie_dto.dart';
-import 'package:movielog/data/services/member_check_service.dart';
+import 'package:movielog/data/services/sign_up_service.dart';
 import 'package:movielog/data/services/rating_api_service.dart';
 import 'package:movielog/data/services/tmdb_movie_service.dart';
 import 'package:movielog/data/services/week06_fixture_services.dart';
 import 'package:movielog/view_models/sign_up_view_model.dart';
 import 'package:movielog/view_models/my_ratings_view_model.dart';
 
-class ControlledChecks extends MemberCheckService {
+class ControlledChecks extends SignUpService {
   ControlledChecks() : super(Dio());
   final nicknames = <Completer<bool>>[];
   final emails = <Completer<bool>>[];
@@ -75,7 +75,7 @@ RatingDto rating(int id, {int movieId = 550}) => RatingDto(
 
 void main() {
   test('nickname/email duplicate values restore errors without a new request; submit requires both checks', () async {
-    final service = FixtureMemberCheckService(delay: Duration.zero);
+    final service = FixtureSignUpService(delay: Duration.zero);
     final vm = SignUpViewModel(service);
     expect(vm.canCheckNickname, isFalse);
     vm.onNicknameChanged('수현');
@@ -99,7 +99,7 @@ void main() {
     expect(service.emailRequests.length, 1);
     vm.onNicknameChanged('새닉네임');
     vm.onEmailChanged('new@example.com');
-    vm.onPasswordChanged('password123');
+    vm.onPasswordChanged('Valid123!');
     vm.onTermsChanged(true);
     expect(vm.canSubmit, isFalse);
     await vm.checkNickname('새닉네임');
@@ -137,10 +137,7 @@ void main() {
   test(
     'network failure differs from duplicate and in-flight disposal is safe',
     () async {
-      final service = FixtureMemberCheckService(
-        fail: true,
-        delay: Duration.zero,
-      );
+      final service = FixtureSignUpService(fail: true, delay: Duration.zero);
       final vm = SignUpViewModel(service)..onNicknameChanged('새닉네임');
       await vm.checkNickname('새닉네임');
       expect(vm.nicknameCheckStatus, CheckStatus.error);
@@ -203,7 +200,16 @@ void main() {
     expect(vm.status, MyRatingsLoadStatus.empty);
     service.fetch = () async => throw DioException(
       requestOptions: RequestOptions(),
-      response: Response(requestOptions: RequestOptions(), statusCode: 404),
+      response: Response(
+        requestOptions: RequestOptions(),
+        statusCode: 404,
+        data: {
+          'isSuccess': false,
+          'code': 'COMMON404',
+          'message': '존재하지 않는 회원입니다.',
+          'result': null,
+        },
+      ),
     );
     await vm.load();
     expect(vm.status, MyRatingsLoadStatus.error);
