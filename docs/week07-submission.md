@@ -4,6 +4,7 @@
 
 - 6주차 구현은 PR #7로 main 병합 완료: https://github.com/kiwi13ird/movieLog/pull/7
 - 7주차 작업 브랜치: `Week07` (6주차가 반영된 main에서 생성)
+- 7주차 PR: https://github.com/kiwi13ird/movieLog/pull/8 (병합하지 않음)
 - 위 PR #7은 **6주차 PR**입니다. 7주차 제출 시에는 Week07의 새 PR 링크를 사용하세요.
 
 ## 이번 구현
@@ -157,7 +158,7 @@ dart run tool/verify_week07_contract.dart
 
 ## 제출 양식
 
-PR 링크: (Week07의 PR을 별도로 생성)
+PR 링크: https://github.com/kiwi13ird/movieLog/pull/8
 생성한 본인 테스트 계정(비밀번호 제외):
 닉네임/이메일 확인과 입력 변경 무효화:
 회원가입 결과와 최종 409:
@@ -180,3 +181,15 @@ fixture로 검증한 항목:
 화면 상태:
 원인과 수정:
 재검증:
+
+## 생성된 제출 이미지
+
+`artifacts/week07/captures/README.md`에 노션 첨부 순서가 있습니다. PNG 25장 중 01–22는 실제 앱 위젯과 재현용 API로 만든 화면이며, 23–25는 실제 검사 로그·검증 범위·PR 정보를 정리한 이미지입니다. 실제 서버 쓰기나 기기 수동 검증을 완료한 자료는 아닙니다.
+
+`artifacts/week07/captures/gallery.html`을 열면 전체 이미지를 볼 수 있습니다. Mac의 AppleSDGothicNeo 글꼴을 사용한 opt-in 렌더링 도구는 다음과 같이 실행합니다. `support/`에는 캡처에 사용한 공개 TMDB 메타데이터와 포스터만 있으며 인증 값은 없습니다.
+
+```bash
+flutter analyze > artifacts/week07/captures/flutter-analyze.txt 2>&1
+flutter test --reporter expanded > artifacts/week07/captures/flutter-test.txt 2>&1
+flutter test tool/capture_week07.dart --dart-define=WEEK07_FIXTURE=success
+```
