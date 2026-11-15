@@ -1,3 +1,5 @@
+import 'package:movielog/data/services/week06_fixture_services.dart';
+import 'package:movielog/widgets/movielog_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:movielog/data/services/fixture_movie_service.dart';
@@ -17,6 +19,10 @@ void main() {
       find.byKey(const Key('emailField')),
       'kiwi@movielog.com',
     );
+    await tester.tap(find.byKey(const Key('checkNicknameButton')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('checkEmailButton')));
+    await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('passwordField')),
       'password123',
@@ -28,7 +34,10 @@ void main() {
 
   testWidgets('시작-회원가입-홈 흐름과 온보딩 백스택이 올바르다', (tester) async {
     await tester.pumpWidget(
-      MovieLogApp(service: FixtureMovieService('posters')),
+      MovieLogApp(
+        service: FixtureMovieService('posters'),
+        memberService: FixtureMemberCheckService(delay: Duration.zero),
+      ),
     );
 
     expect(find.text('시작하기'), findsOneWidget);
@@ -52,11 +61,12 @@ void main() {
       MovieLogApp(
         initialLocation: '/signup',
         service: FixtureMovieService('posters'),
+        memberService: FixtureMemberCheckService(delay: Duration.zero),
       ),
     );
 
-    FilledButton button() =>
-        tester.widget<FilledButton>(find.byKey(const Key('signUpButton')));
+    MovieLogButton button() =>
+        tester.widget<MovieLogButton>(find.byKey(const Key('signUpButton')));
     expect(button().onPressed, isNull);
     await enterValidSignUp(tester);
     expect(button().onPressed, isNotNull);
@@ -67,6 +77,7 @@ void main() {
       MovieLogApp(
         initialLocation: '/home',
         service: FixtureMovieService('posters'),
+        memberService: FixtureMemberCheckService(delay: Duration.zero),
       ),
     );
 
@@ -103,6 +114,7 @@ void main() {
       MovieLogApp(
         initialLocation: '/movies',
         service: FixtureMovieService('posters'),
+        memberService: FixtureMemberCheckService(delay: Duration.zero),
       ),
     );
     await tester.pump(const Duration(seconds: 1));

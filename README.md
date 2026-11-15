@@ -36,3 +36,11 @@ samples, guidance on mobile development, and a full API reference.
 `.env.example`을 참고해 `.env`를 설정하세요. 토큰은 커밋하지 않습니다.
 
 실행·촬영·제출 방법: [5주차 제출 안내](docs/week05-submission.md)
+
+## 6주차 중복 확인 + 내가 등록한 평점
+
+워크북 v5 공개 API로 닉네임·이메일 중복 확인과 학습용 memberId 1 평점 조회를 연결했습니다.
+중복 문자열 재입력 시 에러 복원, 요청 응답 무효화, TMDB 상세 캐시/placeholder를 지원합니다.
+계정 생성·평점 저장 요청은 보내지 않습니다.
+
+실행·검증 모드·캡처 순서·제출 양식: [6주차 제출 안내](docs/week06-submission.md)
