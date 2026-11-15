@@ -55,6 +55,7 @@ flutter run -d emulator-5554
 아래는 기기 안의 메모리 API 에뮬레이터를 사용합니다. **FIXTURE 배너**가 표시되고 실제 서버 데이터는 변경하지 않습니다.
 제출 자료에 반드시 'fixture로 검증'이라고 표시하고 실제 서버 인증과 구분하세요.
 fixture 회원 ID 9001은 실제 본인 계정이 아닙니다.
+영화 제목·포스터는 실제 TMDB에서 가져옵니다. .env의 TMDB_ACCESS_TOKEN과 인터넷 연결을 유지하세요.
 각 실행 사이에는 q로 종료합니다. debug 옵션은 release에서 제외됩니다.
 
 ### 기본 CRUD + 다중 삭제

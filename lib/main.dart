@@ -302,7 +302,8 @@ class _MovieLogAppState extends State<MovieLogApp> {
 TmdbMovieService createService() {
   const week07Mode = String.fromEnvironment('WEEK07_FIXTURE');
   if (kDebugMode && week07Mode.isNotEmpty) {
-    return Week06FixtureMovieService('success');
+    // Only MovieLog writes are simulated; movie titles/posters remain real.
+    return TmdbMovieService(createTmdbClient());
   }
   const week06Mode = String.fromEnvironment('WEEK06_FIXTURE');
   if (kDebugMode && week06Mode.isNotEmpty) {
