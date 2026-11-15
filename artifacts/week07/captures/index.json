@@ -1,0 +1,127 @@
+[
+  {
+    "file": "01_signup_ready.png",
+    "title": "회원가입 제출 전 · 중복 확인 완료",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "02_signup_success.png",
+    "title": "회원가입 성공 Snackbar · 생성 회원 ID",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "03_signup_final_409.png",
+    "title": "최종 중복 409 · 입력 유지",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "04_create_comment_no_star.png",
+    "title": "코멘트 입력 · 별점 미선택 확인 비활성",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "05_create_star_comment.png",
+    "title": "정수 별점과 코멘트 · 확인 활성",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "06_detail_create_success.png",
+    "title": "영화 상세 · 평점 등록 성공 Snackbar",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "07_create_then_get.png",
+    "title": "등록 후 내 평점 GET 재조회",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "08_edit_prefilled.png",
+    "title": "기존 별점·코멘트가 채워진 수정 Dialog",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "09_edit_then_get.png",
+    "title": "수정 후 내 평점 GET 재조회",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "10_delete_confirmation.png",
+    "title": "삭제 확인 Dialog",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "11_delete_cancel_kept.png",
+    "title": "삭제 취소 · 기존 평점 유지",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "12_delete_success_empty.png",
+    "title": "마지막 평점 삭제 성공 · Empty",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "13_delete_then_get.png",
+    "title": "단일 삭제 성공 후 목록 갱신",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "14_write_failure_draft_kept.png",
+    "title": "저장 실패 · 별점과 입력 코멘트 유지",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "15_saved_get_failed.png",
+    "title": "저장 성공 · GET 실패 · 조회 전용 재시도",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "16_get_retry_success.png",
+    "title": "GET만 재시도한 후 정상 목록",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "17_bulk_zero_disabled.png",
+    "title": "편집 모드 · 선택 0개 삭제 비활성",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "18_bulk_three_selected.png",
+    "title": "3개 선택 · 삭제 버튼 활성",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "19_bulk_confirmation.png",
+    "title": "다중 삭제 확인 Dialog",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "20_bulk_loading_overlay.png",
+    "title": "확인창 닫힘 · 다중 삭제 로딩 오버레이",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "21_bulk_partial_failure.png",
+    "title": "부분 실패 · 실패 카드 선택 유지 · Snackbar",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "22_signup_submitting.png",
+    "title": "회원가입 진행 중 · 뒤로가기 차단 상태",
+    "source": "실제 앱 위젯 / FIXTURE API / 실제 TMDB 포스터"
+  },
+  {
+    "file": "23_flutter_verification.png",
+    "title": "코드 검증 결과",
+    "source": "실제 실행 로그 / 검증 범위 / GitHub PR 정보"
+  },
+  {
+    "file": "24_guided_required_verification.png",
+    "title": "Guided / Required 검증 범위",
+    "source": "실제 실행 로그 / 검증 범위 / GitHub PR 정보"
+  },
+  {
+    "file": "25_pull_request.png",
+    "title": "Pull Request #8",
+    "source": "실제 실행 로그 / 검증 범위 / GitHub PR 정보"
+  }
+]

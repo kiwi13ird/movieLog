@@ -226,7 +226,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                                   movie: movie,
                                   onTap: () => context.push(
                                     '/movies/${movie.id}',
-                                    extra: movie,
+                                    extra: vm.movies[index],
                                   ),
                                 );
                               },

@@ -51,3 +51,5 @@ app.*.map.json
 
 #env
 .env
+# Locally packaged copy of the committed Week07 PNG images
+/artifacts/week07/week07-submission-images.zip

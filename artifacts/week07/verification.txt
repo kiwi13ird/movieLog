@@ -1,0 +1,36 @@
+MovieLog Week07 verification — 2026-11-15 (Asia/Seoul)
+
+Prerequisite: Week06 merged into main via PR #7.
+https://github.com/kiwi13ird/movieLog/pull/7
+
+flutter analyze: No issues found.
+flutter test: 38 passed.
+flutter build apk --debug: Built build/app/outputs/flutter-apk/app-debug.apk
+
+Read-only remote Swagger verification:
+POST /v6/members -> 201
+GET /v6/members/nickname/{nickname} -> 200
+GET /v6/members/email/{email} -> 200
+GET /v6/members/{memberId}/ratings -> 200
+POST /v6/members/{memberId}/ratings -> 201
+PATCH /v6/members/{memberId}/ratings/{ratingId} -> 200
+DELETE /v6/members/{memberId}/ratings/{ratingId} -> 204
+
+Fixtures verify:
+- Signup success memberId, final 409, password-specific 400, duplicate POST prevention.
+- Signup back navigation prevention and input preservation.
+- TMDB movie ID -> rating payload; no mutation without a learning member.
+- Direct GET array / common write wrapper / empty DELETE body.
+- Integer stars, optional comment, prefilled edit, comment null clearing.
+- Dialog input preservation and back prevention during writes.
+- Single delete cancel: zero DELETE requests; pending dialog remains open.
+- Bulk confirmation closes before overlay; route exit blocked.
+- Partial bulk failure leaves only failed records selected for retry.
+- Successful write + failed GET: GET-only retry, no duplicate write.
+
+Not verified live:
+- Creating a real user-owned account and writing/deleting remote ratings.
+- Manual Android screenshots, video and offline recovery.
+- Physical-device release execution.
+
+No passwords/tokens are included in this record.

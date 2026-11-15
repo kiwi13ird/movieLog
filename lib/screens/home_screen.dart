@@ -52,10 +52,7 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 14),
               child: MovieCard(
                 movie: dto.toMovie(vm.genres),
-                onTap: () => context.push(
-                  '/movies/${dto.id}',
-                  extra: dto.toMovie(vm.genres),
-                ),
+                onTap: () => context.push('/movies/${dto.id}', extra: dto),
               ),
             ),
           const Text(
