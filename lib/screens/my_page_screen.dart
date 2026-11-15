@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 
 class MyPageScreen extends StatelessWidget {
   const MyPageScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               '마이페이지',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
             ),
-            SizedBox(height: 28),
-            Card(
+            const SizedBox(height: 28),
+            const Card(
               child: Padding(
                 padding: EdgeInsets.all(22),
                 child: Row(
@@ -47,6 +49,23 @@ class MyPageScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            Card(
+              child: ListTile(
+                key: const Key('myRatingsTile'),
+                leading: const Icon(Icons.star_outline_rounded),
+                title: const Text('내가 등록한 평점'),
+                subtitle: const Text('학습용 회원 1의 공개 데이터'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/my/ratings'),
+              ),
+            ),
+            if (kDebugMode)
+              TextButton(
+                key: const Key('buttonShowcaseLink'),
+                onPressed: () => context.push('/button-showcase'),
+                child: const Text('공용 버튼 비교'),
+              ),
           ],
         ),
       ),

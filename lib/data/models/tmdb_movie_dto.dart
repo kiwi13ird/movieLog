@@ -37,9 +37,13 @@ class TmdbMovieDto {
     backdropPath: json['backdrop_path'] as String?,
     popularity: (json['popularity'] as num? ?? 0).toDouble(),
     releaseDate: json['release_date'] as String? ?? '',
-    genreIds: (json['genre_ids'] as List? ?? [])
-        .map((e) => (e as num).toInt())
-        .toList(),
+    genreIds:
+        (json['genre_ids'] as List? ??
+                (json['genres'] as List? ?? [])
+                    .map((genre) => (genre as Map<String, dynamic>)['id'])
+                    .toList())
+            .map((e) => (e as num).toInt())
+            .toList(),
     voteAverage: (json['vote_average'] as num? ?? 0).toDouble(),
   );
   Movie toMovie(List<TmdbGenreDto> genres) => Movie(

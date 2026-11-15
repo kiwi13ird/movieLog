@@ -1,0 +1,22 @@
+MovieLog week06 verification — 2026-11-09 (Asia/Seoul)
+
+flutter analyze
+No issues found!
+
+flutter test
+22 tests passed.
+
+flutter build apk --debug
+Built build/app/outputs/flutter-apk/app-debug.apk
+
+Live read-only service verification:
+PASS: v5 nickname/email GET raw available booleans (true / true)
+PASS: memberId 1 ratings=3, null comments=1
+PASS: TMDB movieId=13, title parsed, poster=true
+PASS: TMDB movieId=680, title parsed, poster=true
+PASS: TMDB movieId=550, title parsed, poster=true
+
+Token values were not printed. .env is ignored and untracked.
+Manual Android screenshots, video and offline-recovery verification remain to be captured.
+Debug fixtures have a FIXTURE banner; they are separate from live API evidence.
+No account creation or rating write API calls were implemented.
