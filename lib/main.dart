@@ -1,22 +1,21 @@
+import 'core/auth/token_storage.dart';
+import 'core/network/auth_interceptor.dart';
+import 'data/services/session_api_service.dart';
+import 'view_models/auth_view_model.dart';
+import 'screens/login_screen.dart';
+import 'screens/edit_profile_screen.dart';
+import 'screens/session_ratings_screen.dart';
+
 import 'package:dio/dio.dart';
 
 import 'core/network/movie_log_client.dart';
-import 'view_models/learning_member_session.dart';
-import 'data/models/sign_up_models.dart';
 import 'data/models/tmdb_movie_dto.dart';
-import 'data/services/week07_fixture_adapter.dart';
 import 'screens/movie_detail_loader.dart';
 import 'data/services/sign_up_service.dart';
-import 'data/services/rating_api_service.dart';
-import 'data/services/week06_fixture_services.dart';
 import 'view_models/sign_up_view_model.dart';
-import 'view_models/my_ratings_view_model.dart';
-import 'screens/my_ratings_screen.dart';
 import 'screens/button_showcase_screen.dart';
 
 import 'package:flutter/foundation.dart';
-
-import 'data/services/fixture_movie_service.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +31,6 @@ import 'screens/home_screen.dart';
 import 'screens/movie_list_screen.dart';
 import 'screens/my_page_screen.dart';
 import 'screens/sign_up_screen.dart';
-import 'screens/start_screen.dart';
 import 'widgets/main_screen.dart';
 
 Future<void> main() async {
@@ -47,14 +45,12 @@ class MovieLogApp extends StatefulWidget {
     this.initialLocation = '/',
     this.service,
     this.memberService,
-    this.ratingService,
-    this.session,
+    this.auth,
     super.key,
   });
 
-  final LearningMemberSession? session;
+  final AuthViewModel? auth;
   final SignUpService? memberService;
-  final RatingApiService? ratingService;
 
   final TmdbMovieService? service;
 
@@ -65,15 +61,69 @@ class MovieLogApp extends StatefulWidget {
 }
 
 class _MovieLogAppState extends State<MovieLogApp> {
+  late final TokenStorage _storage = SecureTokenStorage();
+  late final Dio _publicClient = createMovieLogClient();
+  late final Dio _authClient = createMovieLogClient()
+    ..options.followRedirects = false
+    ..interceptors.add(AuthInterceptor(_storage, () => _auth.sessionVersion));
+  late final AuthViewModel _auth =
+      widget.auth ??
+      AuthViewModel(SessionApiService(_publicClient, _authClient), _storage);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _auth.restoreSession();
+    });
+  }
+
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   late final GoRouter _router = GoRouter(
     initialLocation: widget.initialLocation,
     navigatorKey: _rootNavigatorKey,
+    refreshListenable: _auth,
+    redirect: (context, state) {
+      final path = state.uri.path;
+      final public = {'/login', '/register', '/signup'}.contains(path);
+      return switch (_auth.status) {
+        AuthStatus.initializing || AuthStatus.retryRequired =>
+          path == '/start' ? null : '/start?from=${Uri.encodeComponent(path)}',
+        AuthStatus.signedOut ||
+        AuthStatus.authenticating => public ? null : '/login',
+        AuthStatus.signedIn =>
+          public || path == '/' || path == '/start'
+              ? (state.uri.queryParameters['from']?.startsWith('/my') == true ||
+                        state.uri.queryParameters['from']?.startsWith(
+                              '/movies',
+                            ) ==
+                            true
+                    ? state.uri.queryParameters['from']!
+                    : '/home')
+              : null,
+      };
+    },
     routes: [
+      GoRoute(
+        path: '/start',
+        builder: (context, state) => const SessionSplashScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => LoginScreen(
+          initialEmail: state.extra is String ? state.extra as String : null,
+        ),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => ChangeNotifierProvider(
+          create: (context) => SignUpViewModel(context.read<SignUpService>()),
+          child: const SignUpScreen(),
+        ),
+      ),
       GoRoute(
         path: '/',
         name: 'start',
-        builder: (context, state) => const StartScreen(),
+        builder: (context, state) => const SessionSplashScreen(),
       ),
       GoRoute(
         path: '/signup',
@@ -140,39 +190,15 @@ class _MovieLogAppState extends State<MovieLogApp> {
             builder: (context, state) => const MyPageScreen(),
             routes: [
               GoRoute(
+                path: 'profile/edit',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const EditProfileScreen(),
+              ),
+              GoRoute(
                 path: 'ratings',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (context, state) {
-                  final id = context.watch<LearningMemberSession>().memberId;
-                  if (id == null) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        centerTitle: true,
-                        title: const Text('내가 등록한 평점'),
-                      ),
-                      body: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('학습용 회원가입이 필요합니다.'),
-                            TextButton(
-                              onPressed: () => context.push('/signup'),
-                              child: const Text('회원가입하기'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                  return ChangeNotifierProvider(
-                    key: ValueKey(id),
-                    create: (context) => MyRatingsViewModel(
-                      context.read<RatingApiService>(),
-                      context.read<TmdbMovieService>(),
-                      id,
-                    )..load(),
-                    child: const MyRatingsScreen(),
-                  );
+                  return const SessionRatingsScreen();
                 },
               ),
             ],
@@ -185,6 +211,9 @@ class _MovieLogAppState extends State<MovieLogApp> {
   @override
   void dispose() {
     _router.dispose();
+    _auth.dispose();
+    _publicClient.close(force: true);
+    _authClient.close(force: true);
     super.dispose();
   }
 
@@ -196,77 +225,17 @@ class _MovieLogAppState extends State<MovieLogApp> {
       borderSide: const BorderSide(color: Color(0xFFE4E1EC)),
     );
 
-    const week06Mode = String.fromEnvironment('WEEK06_FIXTURE');
-    const week07Mode = String.fromEnvironment('WEEK07_FIXTURE');
     return MultiProvider(
       providers: [
-        Provider<Dio>(
-          create: (_) {
-            final dio = createMovieLogClient();
-            if (kDebugMode && week07Mode.isNotEmpty) {
-              final adapter = Week07FixtureAdapter(week07Mode);
-              if (week07Mode != 'empty') adapter.seed();
-              dio.httpClientAdapter = adapter;
-            }
-            return dio;
-          },
-          dispose: (_, dio) => dio.close(force: true),
-        ),
-        if (widget.session != null)
-          ChangeNotifierProvider<LearningMemberSession>.value(
-            value: widget.session!,
-          )
-        else
-          ChangeNotifierProvider<LearningMemberSession>(
-            create: (_) {
-              final session = LearningMemberSession();
-              if (kDebugMode &&
-                  week07Mode.isNotEmpty &&
-                  week07Mode != 'signup-409' &&
-                  week07Mode != 'password-400') {
-                session.setMember(
-                  const SignUpResult(
-                    memberId: 9001,
-                    email: 'fixture@example.com',
-                    nickname: '검증회원',
-                  ),
-                );
-              }
-              return session;
-            },
-          ),
+        ChangeNotifierProvider<AuthViewModel>.value(value: _auth),
         Provider<TmdbMovieService>(
           create: (_) => widget.service ?? createService(),
         ),
         Provider<SignUpService>(
-          create: (context) =>
-              widget.memberService ??
-              (kDebugMode && week06Mode.isNotEmpty
-                  ? FixtureSignUpService(fail: week06Mode == 'error')
-                  : SignUpService(context.read<Dio>())),
-        ),
-        Provider<RatingApiService>(
-          create: (context) =>
-              widget.ratingService ??
-              (kDebugMode && week06Mode.isNotEmpty
-                  ? FixtureRatingApiService(week06Mode)
-                  : RatingApiService(context.read<Dio>())),
+          create: (_) => widget.memberService ?? SignUpService(_publicClient),
         ),
       ],
       child: MaterialApp.router(
-        builder: (context, child) {
-          const mode = String.fromEnvironment('TMDB_FIXTURE');
-          return kDebugMode &&
-                  (mode.isNotEmpty ||
-                      week06Mode.isNotEmpty ||
-                      week07Mode.isNotEmpty)
-              ? Banner(
-                  message: 'FIXTURE',
-                  location: BannerLocation.topEnd,
-                  child: child!,
-                )
-              : child!;
-        },
         debugShowCheckedModeBanner: false,
         title: 'MovieLog',
         routerConfig: _router,
@@ -299,17 +268,6 @@ class _MovieLogAppState extends State<MovieLogApp> {
   }
 }
 
-TmdbMovieService createService() {
-  const week07Mode = String.fromEnvironment('WEEK07_FIXTURE');
-  if (kDebugMode && week07Mode.isNotEmpty) {
-    // Only MovieLog writes are simulated; movie titles/posters remain real.
-    return TmdbMovieService(createTmdbClient());
-  }
-  const week06Mode = String.fromEnvironment('WEEK06_FIXTURE');
-  if (kDebugMode && week06Mode.isNotEmpty) {
-    return Week06FixtureMovieService(week06Mode);
-  }
-  const mode = String.fromEnvironment('TMDB_FIXTURE');
-  if (kDebugMode && mode.isNotEmpty) return FixtureMovieService(mode);
-  return TmdbMovieService(createTmdbClient());
-}
+// Normal app launches always use the real TMDB API. Test doubles are injected
+// explicitly by tests/capture tools, never selected through runtime flags.
+TmdbMovieService createService() => TmdbMovieService(createTmdbClient());

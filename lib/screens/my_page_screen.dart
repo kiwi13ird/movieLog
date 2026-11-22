@@ -1,82 +1,71 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../view_models/learning_member_session.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:go_router/go_router.dart';
+import '../view_models/auth_view_model.dart';
 
 class MyPageScreen extends StatelessWidget {
   const MyPageScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '마이페이지',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 28),
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(22),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      child: Icon(Icons.person_rounded, size: 34),
-                    ),
-                    SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '무비로그 회원',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '나만의 영화 기록',
-                          style: TextStyle(color: Color(0xFF6F6B78)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Card(
-              child: ListTile(
-                key: const Key('myRatingsTile'),
-                leading: const Icon(Icons.star_outline_rounded),
-                title: const Text('내가 등록한 평점'),
-                subtitle: Text(
-                  context.watch<LearningMemberSession>().memberId == null
-                      ? '회원가입 후 이용할 수 있어요'
-                      : '학습용 회원 #${context.watch<LearningMemberSession>().memberId}',
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push('/my/ratings'),
-              ),
-            ),
-            if (kDebugMode)
-              TextButton(
-                key: const Key('buttonShowcaseLink'),
-                onPressed: () => context.push('/button-showcase'),
-                child: const Text('공용 버튼 비교'),
-              ),
-          ],
-        ),
+    final auth = context.watch<AuthViewModel>();
+    final member = auth.member;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('마이페이지'),
+        actions: [
+          TextButton(onPressed: auth.logout, child: const Text('로그아웃')),
+        ],
       ),
+      body: auth.memberStatus == MemberLoadStatus.loading
+          ? const Center(child: CircularProgressIndicator())
+          : auth.memberStatus == MemberLoadStatus.error
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(auth.message ?? '내 정보를 불러오지 못했어요.'),
+                  TextButton(
+                    onPressed: () => auth.loadMember(force: true),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
+              ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const CircleAvatar(
+                  radius: 36,
+                  child: Icon(Icons.person, size: 40),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  member?.nickname ?? '내 정보 확인 중',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Text(member?.email ?? ''),
+                if (member != null)
+                  Text(
+                    '${member.createdAt.year}.${member.createdAt.month.toString().padLeft(2, '0')}.${member.createdAt.day.toString().padLeft(2, '0')} 가입',
+                  ),
+                TextButton(
+                  onPressed: member == null
+                      ? null
+                      : () => context.push('/my/profile/edit'),
+                  child: const Text('프로필 수정'),
+                ),
+                Card(
+                  child: ListTile(
+                    key: const Key('myRatingsTile'),
+                    title: const Text('내가 등록한 평점'),
+                    subtitle: const Text('현재 로그인 세션에서 생성한 기록'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/my/ratings'),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

@@ -1,14 +1,19 @@
+import 'auth_view_model.dart';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/models/api_failure.dart';
 import '../data/models/rating_request.dart';
 import '../data/models/submit_status.dart';
 import '../data/models/tmdb_movie_dto.dart';
-import '../data/services/rating_api_service.dart';
+import '../data/services/legacy_rating_api_service.dart';
 
 class MovieDetailViewModel extends ChangeNotifier {
-  MovieDetailViewModel(this._service, this.memberId, this.movie);
-  final RatingApiService _service;
+  MovieDetailViewModel(this._service, this.memberId, this.movie, {this.auth});
+  final AuthViewModel? auth;
+  bool get canRate =>
+      auth != null ? auth!.status == AuthStatus.signedIn : memberId != null;
+  final LegacyRatingApiService? _service;
   final int? memberId;
   final TmdbMovieDto movie;
   SubmitStatus submitStatus = SubmitStatus.idle;
@@ -18,19 +23,23 @@ class MovieDetailViewModel extends ChangeNotifier {
   Future<void> createRating({required int score, String? comment}) async {
     if (_disposed || busy) throw const ApiFailure('요청 처리 중입니다.');
     final id = memberId;
-    if (id == null) throw const ApiFailure('먼저 학습용 회원가입을 완료해 주세요.');
+    if (!canRate) throw const ApiFailure('먼저 학습용 회원가입을 완료해 주세요.');
     submitStatus = SubmitStatus.submitting;
     submitMessage = null;
     notifyListeners();
     try {
-      await _service.createRating(
-        memberId: id,
-        request: CreateRatingRequest(
-          movieId: movie.id,
-          score: score,
-          comment: comment,
-        ),
-      );
+      if (auth != null) {
+        await auth!.createRating(movie, score, comment);
+      } else {
+        await _service!.createRating(
+          memberId: id!,
+          request: CreateRatingRequest(
+            movieId: movie.id,
+            score: score,
+            comment: comment,
+          ),
+        );
+      }
       if (_disposed) return;
       submitStatus = SubmitStatus.success;
       submitMessage = '평점이 등록되었습니다. 마이페이지에서 확인해 주세요.';

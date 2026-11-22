@@ -45,7 +45,7 @@ samples, guidance on mobile development, and a full API reference.
 
 실행·검증 모드·캡처 순서·제출 양식: [6주차 제출 안내](docs/week06-submission.md)
 
-## 현재: 7주차 v6 회원가입·평점 CRUD + Challenge
+## 7주차 v6 회원가입·평점 CRUD + Challenge
 
 현재 앱은 v6로 회원가입하고 성공한 memberId를 메모리 세션에 저장합니다.
 영화 상세에서 정수 별점·코멘트를 등록하고, 마이페이지에서 수정·단일 삭제·다중 삭제합니다.
@@ -53,3 +53,10 @@ samples, guidance on mobile development, and a full API reference.
 이전 4~6주차 안내는 당시 구현 기록입니다.
 
 실행·챌린지 검증 모드·촬영 순서: [7주차 제출 안내](docs/week07-submission.md)
+
+## 현재 8주차 JWT 인증과 v7 평점
+
+`week08` 브랜치에서 보안 토큰 저장, 로그인/복원/만료/로그아웃, 내 정보와 닉네임 수정, v7 평점 CRUD 및 챌린지를 구현했습니다.
+현재 세션에서 등록한 평점만 관리하며, 전체 내 평점 재시작 복원은 서버 계약상 지원하지 않습니다.
+
+구현·실제 API 검증·Android 보안 저장소 증거·제출 절차: [8주차 제출 안내](docs/week08-submission.md)

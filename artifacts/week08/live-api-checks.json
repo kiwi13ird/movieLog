@@ -1,0 +1,101 @@
+{
+  "note": "Workbook API disposable test member. Tokens/passwords deliberately omitted. Rating deleted after verification.",
+  "checks": [
+    {
+      "check": "test member signup",
+      "method": "POST",
+      "path": "/v6/members",
+      "status": 201,
+      "code": "COMMON201",
+      "resultType": "dict"
+    },
+    {
+      "check": "login success",
+      "method": "POST",
+      "path": "/v7/auth/login",
+      "status": 200,
+      "code": "COMMON200",
+      "resultType": "dict"
+    },
+    {
+      "check": "verified profile",
+      "method": "GET",
+      "path": "/v7/members/me",
+      "status": 200,
+      "code": "COMMON200",
+      "resultType": "dict"
+    },
+    {
+      "check": "nickname update",
+      "method": "PATCH",
+      "path": "/v7/members/me",
+      "status": 200,
+      "code": "COMMON200",
+      "resultType": "dict"
+    },
+    {
+      "check": "rating create",
+      "method": "POST",
+      "path": "/v7/ratings",
+      "status": 201,
+      "code": "COMMON201",
+      "resultType": "dict"
+    },
+    {
+      "check": "rating duplicate",
+      "method": "POST",
+      "path": "/v7/ratings",
+      "status": 409,
+      "code": "RATING409_1",
+      "resultType": "NoneType"
+    },
+    {
+      "check": "rating update",
+      "method": "PATCH",
+      "path": "/v7/ratings/19",
+      "status": 200,
+      "code": "COMMON200",
+      "resultType": "dict"
+    },
+    {
+      "check": "rating delete",
+      "method": "DELETE",
+      "path": "/v7/ratings/19",
+      "status": 200,
+      "code": "COMMON200",
+      "resultType": "NoneType"
+    },
+    {
+      "check": "deleted rating",
+      "method": "DELETE",
+      "path": "/v7/ratings/19",
+      "status": 404,
+      "code": "RATING404_1",
+      "resultType": "NoneType"
+    },
+    {
+      "check": "missing token",
+      "method": "GET",
+      "path": "/v7/members/me",
+      "status": 401,
+      "code": "AUTH401_2",
+      "resultType": "NoneType"
+    },
+    {
+      "check": "invalid token",
+      "method": "GET",
+      "path": "/v7/members/me",
+      "status": 401,
+      "code": "AUTH401_3",
+      "resultType": "NoneType"
+    },
+    {
+      "check": "login failure",
+      "method": "POST",
+      "path": "/v7/auth/login",
+      "status": 401,
+      "code": "AUTH401_1",
+      "resultType": "NoneType"
+    }
+  ]
+}
