@@ -1,30 +1,25 @@
-import 'package:movielog/view_models/learning_member_session.dart';
-import 'package:movielog/data/models/sign_up_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:movielog/main.dart';
+import 'package:movielog/screens/sign_up_screen.dart';
+import 'package:movielog/screens/button_showcase_screen.dart';
+import 'package:movielog/view_models/sign_up_view_model.dart';
+import 'package:provider/provider.dart';
 import 'package:movielog/data/services/week06_fixture_services.dart';
 import 'package:movielog/widgets/movielog_button.dart';
 
-MovieLogApp fixtureApp(
+Widget fixtureApp(
   String route, {
   String mode = 'success',
   FixtureSignUpService? checks,
   Duration delay = Duration.zero,
-}) => MovieLogApp(
-  key: UniqueKey(),
-  session: LearningMemberSession()
-    ..setMember(
-      const SignUpResult(
-        memberId: 9001,
-        email: 'fixture@example.com',
-        nickname: '검증회원',
-      ),
-    ),
-  initialLocation: route,
-  service: Week06FixtureMovieService(mode),
-  memberService: checks ?? FixtureSignUpService(delay: delay),
-  ratingService: FixtureRatingApiService(mode, delay: delay),
+}) => MaterialApp(
+  home: route == '/button-showcase'
+      ? const ButtonShowcaseScreen()
+      : ChangeNotifierProvider(
+          create: (_) =>
+              SignUpViewModel(checks ?? FixtureSignUpService(delay: delay)),
+          child: const SignUpScreen(),
+        ),
 );
 void main() {
   testWidgets(
@@ -121,50 +116,6 @@ void main() {
       expect(find.text('사용할 수 있는 닉네임입니다.'), findsOneWidget);
       expect(find.text('사용할 수 있는 이메일입니다.'), findsOneWidget);
       expect(tester.takeException(), isNull);
-    },
-  );
-  testWidgets('ratings child hides navigation bar; back restores MyPage', (
-    tester,
-  ) async {
-    await tester.pumpWidget(fixtureApp('/my'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('myRatingsTile')));
-    await tester.pumpAndSettle();
-    expect(find.text('학습용 회원 #9001의 평점 · 로그인 인증 전 단계'), findsOneWidget);
-    expect(find.byKey(const Key('ratingsSuccess')), findsOneWidget);
-    expect(find.text('포레스트 검프'), findsOneWidget);
-    expect(find.text('null'), findsNothing);
-    expect(find.byType(NavigationBar), findsNothing);
-    await tester.tap(find.byKey(const Key('ratingsBackButton')));
-    await tester.pumpAndSettle();
-    expect(find.text('마이페이지'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
-  });
-  testWidgets(
-    'ratings loading, empty, failure and missing movie metadata have distinct screens',
-    (tester) async {
-      for (final mode in ['empty', 'error', 'tmdb-error']) {
-        await tester.pumpWidget(
-          fixtureApp(
-            '/my/ratings',
-            mode: mode,
-            delay: const Duration(milliseconds: 800),
-          ),
-        );
-        expect(find.byKey(const Key('ratingsLoading')), findsOneWidget);
-        await tester.pumpAndSettle();
-        if (mode == 'empty') {
-          expect(find.byKey(const Key('ratingsEmpty')), findsOneWidget);
-        } else if (mode == 'error') {
-          expect(find.byKey(const Key('ratingsError')), findsOneWidget);
-          expect(find.text('다시 시도'), findsOneWidget);
-        } else {
-          expect(find.byKey(const Key('ratingsSuccess')), findsOneWidget);
-          expect(find.text('영화 정보를 불러올 수 없어요'), findsWidgets);
-          expect(find.text('최고의 영화!'), findsOneWidget);
-          expect(find.text('★ 5 / 5'), findsOneWidget);
-        }
-      }
     },
   );
   testWidgets('MovieLogButton widths and loading/disabled callback behavior', (

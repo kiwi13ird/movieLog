@@ -97,23 +97,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              if (vm.memberId == null) ...[
-                const Text(
-                  '평점을 남기려면 학습용 회원가입이 필요합니다.',
-                  textAlign: TextAlign.center,
-                ),
-                TextButton(
-                  onPressed: () => context.push('/signup'),
-                  child: const Text('회원가입하기'),
-                ),
-              ] else
-                Text('학습용 회원 #${vm.memberId}', textAlign: TextAlign.center),
               const SizedBox(height: 12),
               FilledButton.icon(
                 key: const Key('openRatingDialogButton'),
-                onPressed: vm.memberId != null && !vm.busy
-                    ? () => _rate(vm)
-                    : null,
+                onPressed: vm.canRate && !vm.busy ? () => _rate(vm) : null,
                 icon: const Icon(Icons.star_outline_rounded),
                 label: const Text('평점 남기기'),
               ),

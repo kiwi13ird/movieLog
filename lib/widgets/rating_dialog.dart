@@ -46,6 +46,11 @@ class _RatingDialogState extends State<RatingDialog> {
       if (mounted) Navigator.pop(context, true);
     } catch (error) {
       if (mounted) {
+        final failure = ApiFailure.from(error);
+        if (failure.code == 'RATING403_1' || failure.code == 'RATING409_1') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(failure.message)));
+        }
         setState(() {
           _saving = false;
           _error = ApiFailure.from(error).message;
@@ -125,6 +130,11 @@ class _DeleteRatingDialogState extends State<DeleteRatingDialog> {
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
+        final failure = ApiFailure.from(e);
+        if (failure.code == 'RATING403_1') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(failure.message)));
+        }
         setState(() {
           _deleting = false;
           _error = ApiFailure.from(e).message;

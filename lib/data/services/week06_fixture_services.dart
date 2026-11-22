@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 import '../models/rating_dto.dart';
 import '../models/tmdb_movie_dto.dart';
 import 'sign_up_service.dart';
-import 'rating_api_service.dart';
+import 'legacy_rating_api_service.dart';
 import 'fixture_movie_service.dart';
 
 /// Explicit debug/test fixtures. The app factories guard these with kDebugMode.
@@ -57,8 +57,8 @@ class FixtureSignUpService extends SignUpService {
       _check(email.trim(), 'noco@umc.com', emailRequests);
 }
 
-class FixtureRatingApiService extends RatingApiService {
-  FixtureRatingApiService(
+class FixtureLegacyRatingApiService extends LegacyRatingApiService {
+  FixtureLegacyRatingApiService(
     this.mode, {
     this.delay = const Duration(milliseconds: 1200),
   }) : super(Dio());

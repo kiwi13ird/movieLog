@@ -4,14 +4,14 @@ import '../data/models/rating_with_movie.dart';
 import '../data/models/rating_dto.dart';
 import '../data/models/api_failure.dart';
 import '../data/models/tmdb_movie_dto.dart';
-import '../data/services/rating_api_service.dart';
+import '../data/services/legacy_rating_api_service.dart';
 import '../data/services/tmdb_movie_service.dart';
 
 enum MyRatingsLoadStatus { idle, loading, success, empty, error }
 
 class MyRatingsViewModel extends ChangeNotifier {
   MyRatingsViewModel(this._service, this._movies, this.memberId);
-  final RatingApiService _service;
+  final LegacyRatingApiService _service;
   final TmdbMovieService _movies;
   final int? memberId;
   bool isWriting = false;

@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/data/models/rating_dto.dart';
 import 'package:movielog/data/models/tmdb_movie_dto.dart';
 import 'package:movielog/data/services/sign_up_service.dart';
-import 'package:movielog/data/services/rating_api_service.dart';
+import 'package:movielog/data/services/legacy_rating_api_service.dart';
 import 'package:movielog/data/services/tmdb_movie_service.dart';
 import 'package:movielog/data/services/week06_fixture_services.dart';
 import 'package:movielog/view_models/sign_up_view_model.dart';
@@ -30,7 +30,7 @@ class ControlledChecks extends SignUpService {
   }
 }
 
-class StubRatings extends RatingApiService {
+class StubRatings extends LegacyRatingApiService {
   StubRatings() : super(Dio());
   final ids = <int>[];
   late Future<List<RatingDto>> Function() fetch;

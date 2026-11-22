@@ -7,7 +7,7 @@ import 'package:movielog/core/network/movie_log_client.dart';
 import 'package:movielog/data/models/rating_dto.dart';
 import 'package:movielog/data/models/tmdb_movie_dto.dart';
 import 'package:movielog/data/services/sign_up_service.dart';
-import 'package:movielog/data/services/rating_api_service.dart';
+import 'package:movielog/data/services/legacy_rating_api_service.dart';
 
 class RecordingAdapter implements HttpClientAdapter {
   final requests = <RequestOptions>[];
@@ -53,7 +53,7 @@ void main() {
     expect(adapter.requests.last.uri.pathSegments.last, '수현');
     expect(await service.checkEmail(' new+tag@example.com '), isFalse);
     expect(adapter.requests.last.uri.pathSegments.last, 'new+tag@example.com');
-    final ratings = await RatingApiService(dio).fetchMyRatings(1);
+    final ratings = await LegacyRatingApiService(dio).fetchMyRatings(1);
     expect(ratings.single.ratingId, 12);
     expect(ratings.single.comment, isNull);
     expect(ratings.single.updatedAt.isUtc, isTrue);

@@ -1,0 +1,9 @@
+00:00 +0: loading /Users/gyuri/development/movielog/test/widget_test.dart
+00:00 +0: /Users/gyuri/development/movielog/tool/capture_week08.dart: (setUpAll)
+00:00 +0: /Users/gyuri/development/movielog/test/widget_test.dart: 보호 경로는 저장소 확인 후 로그인으로 이동하고 뒤로가기로 우회할 수 없다
+00:00 +1: /Users/gyuri/development/movielog/tool/capture_week08.dart: Week08 labeled UI evidence
+00:01 +2: /Users/gyuri/development/movielog/tool/capture_week08.dart: Week08 labeled UI evidence
+00:01 +3: /Users/gyuri/development/movielog/tool/capture_week08.dart: Week08 labeled UI evidence
+00:01 +4: /Users/gyuri/development/movielog/tool/capture_week08.dart: Week08 labeled UI evidence
+00:02 +5: /Users/gyuri/development/movielog/tool/capture_week08.dart: (tearDownAll)
+00:02 +5: All tests passed!

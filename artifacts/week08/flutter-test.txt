@@ -1,0 +1,52 @@
+00:00 +0: loading /Users/gyuri/development/movielog/test/week07_widgets_test.dart
+00:00 +0: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +1: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +2: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +3: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +4: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +5: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +6: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:00 +6: /Users/gyuri/development/movielog/test/challenge_widget_test.dart: failed refresh keeps cards; cancel and retry recover with same genres
+[TMDB 목록] 총 30개 / 고유 ID 30개
+00:01 +7: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:01 +8: /Users/gyuri/development/movielog/test/week07_widgets_test.dart: 닉네임 중복은 입력을 유지하고 재시도 성공 시 마이페이지에 반영된다
+00:01 +9: /Users/gyuri/development/movielog/test/challenge_widget_test.dart: failed refresh keeps cards; cancel and retry recover with same genres
+[TMDB 목록] 총 30개 / 고유 ID 30개
+00:01 +10: /Users/gyuri/development/movielog/test/challenge_widget_test.dart: failed refresh keeps cards; cancel and retry recover with same genres
+00:01 +11: /Users/gyuri/development/movielog/test/challenge_widget_test.dart: failed refresh keeps cards; cancel and retry recover with same genres
+[TMDB 목록] 총 30개 / 고유 ID 30개
+00:01 +12: /Users/gyuri/development/movielog/test/challenge_widget_test.dart: failed refresh keeps cards; cancel and retry recover with same genres
+00:01 +13: /Users/gyuri/development/movielog/test/week06_widgets_test.dart: signup works on a narrow screen and both confirmations gate the full-width button
+00:01 +14: /Users/gyuri/development/movielog/test/week06_widgets_test.dart: signup works on a narrow screen and both confirmations gate the full-width button
+00:01 +15: /Users/gyuri/development/movielog/test/week06_widgets_test.dart: signup works on a narrow screen and both confirmations gate the full-width button
+00:01 +16: /Users/gyuri/development/movielog/test/week06_widgets_test.dart: signup works on a narrow screen and both confirmations gate the full-width button
+00:01 +17: /Users/gyuri/development/movielog/test/week06_widgets_test.dart: signup works on a narrow screen and both confirmations gate the full-width button
+00:01 +18: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +19: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +20: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +21: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +22: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +23: /Users/gyuri/development/movielog/test/widget_test.dart: 프로필과 평점 화면은 하단 탭을 숨기고 취소 시 마이페이지로 돌아간다
+00:01 +24: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +25: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +26: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +27: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +27: /Users/gyuri/development/movielog/test/movie_async_test.dart: deduplicates pages up to 30; genres refresh from page one
+[TMDB 목록] 총 30개 / 고유 ID 30개
+[TMDB 목록] 총 30개 / 고유 ID 30개
+[TMDB 목록] 총 30개 / 고유 ID 30개
+00:02 +28: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +28: /Users/gyuri/development/movielog/test/movie_async_test.dart: failure restores last success and retry keeps last selected genres
+[TMDB 목록] 총 30개 / 고유 ID 30개
+[TMDB 목록] 총 30개 / 고유 ID 30개
+00:02 +29: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +29: /Users/gyuri/development/movielog/test/movie_async_test.dart: empty, initial failure, short popular and disposal are safe
+[TMDB 목록] 총 0개 / 고유 ID 0개
+00:02 +30: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +31: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +32: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +33: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +34: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +35: /Users/gyuri/development/movielog/test/week08_auth_test.dart: old member and rating responses after logout/account switch cannot repopulate session
+00:02 +36: /Users/gyuri/development/movielog/test/week08_auth_test.dart: logout waits for in-flight secure write and blocks login until deletion completes
+00:02 +37: All tests passed!

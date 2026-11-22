@@ -6,7 +6,7 @@ import 'package:movielog/data/models/api_failure.dart';
 import 'package:movielog/data/models/common_response.dart';
 import 'package:movielog/data/models/rating_request.dart';
 import 'package:movielog/data/models/sign_up_models.dart';
-import 'package:movielog/data/services/rating_api_service.dart';
+import 'package:movielog/data/services/legacy_rating_api_service.dart';
 import 'package:movielog/data/services/sign_up_service.dart';
 import 'package:movielog/data/services/week07_fixture_adapter.dart';
 
@@ -72,7 +72,7 @@ void main() {
       ),
     );
     expect(member.result!.memberId, 9001);
-    final service = RatingApiService(dio);
+    final service = LegacyRatingApiService(dio);
     await service.createRating(
       memberId: 9001,
       request: const CreateRatingRequest(movieId: 550, score: 5, comment: '최고'),
@@ -105,7 +105,7 @@ void main() {
   });
   test('create accepts number/null result but rejects success false; DELETE never parses a body', () async {
     final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'));
-    final service = RatingApiService(dio);
+    final service = LegacyRatingApiService(dio);
     for (final body in [
       '{"isSuccess":true,"code":"COMMON201","message":"ok","result":null}',
       '{"isSuccess":true,"code":"COMMON201","message":"ok","result":8}',

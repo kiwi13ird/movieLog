@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/data/models/sign_up_models.dart';
 import 'package:movielog/data/models/api_failure.dart';
 import 'package:movielog/data/services/sign_up_service.dart';
-import 'package:movielog/data/services/rating_api_service.dart';
+import 'package:movielog/data/services/legacy_rating_api_service.dart';
 import 'package:movielog/data/services/week07_fixture_adapter.dart';
 import 'package:movielog/data/services/week06_fixture_services.dart';
 import 'package:movielog/view_models/sign_up_view_model.dart';
@@ -84,7 +84,7 @@ void main() {
       final adapter = Week07FixtureAdapter('success', delay: Duration.zero);
       final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
         ..httpClientAdapter = adapter;
-      final service = RatingApiService(dio);
+      final service = LegacyRatingApiService(dio);
       final vm = MovieDetailViewModel(
         service,
         9001,
@@ -114,7 +114,7 @@ void main() {
     final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
       ..httpClientAdapter = adapter;
     final vm = MyRatingsViewModel(
-      RatingApiService(dio),
+      LegacyRatingApiService(dio),
       Week06FixtureMovieService('success'),
       9001,
     );
@@ -142,7 +142,7 @@ void main() {
     final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
       ..httpClientAdapter = adapter;
     final vm = MyRatingsViewModel(
-      RatingApiService(dio),
+      LegacyRatingApiService(dio),
       Week06FixtureMovieService('success'),
       9001,
     );
@@ -174,7 +174,7 @@ void main() {
     final dio = Dio(BaseOptions(baseUrl: 'https://fixture.invalid'))
       ..httpClientAdapter = adapter;
     final vm = MyRatingsViewModel(
-      RatingApiService(dio),
+      LegacyRatingApiService(dio),
       Week06FixtureMovieService('success'),
       9001,
     );

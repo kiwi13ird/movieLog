@@ -1,3 +1,5 @@
+import 'support/session_fixture.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/main.dart';
@@ -9,7 +11,11 @@ void main() {
     (tester) async {
       final service = FixtureMovieService('posters');
       await tester.pumpWidget(
-        MovieLogApp(initialLocation: '/movies', service: service),
+        MovieLogApp(
+          initialLocation: '/movies',
+          service: service,
+          auth: signedInFixture(),
+        ),
       );
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('movieOptionsButton')));

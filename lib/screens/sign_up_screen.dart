@@ -1,5 +1,4 @@
 import '../data/models/sign_up_models.dart';
-import '../view_models/learning_member_session.dart';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -49,12 +48,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
     if (!mounted) return;
     if (vm.submitStatus == SubmitStatus.success && vm.createdMember != null) {
-      context.read<LearningMemberSession>().setMember(vm.createdMember!);
       _passwordController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('회원가입 완료 · 학습용 회원 #${vm.createdMemberId}')),
-      );
-      context.go('/movies');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: const Text('회원가입이 완료됐어요. 로그인해 주세요.')));
+      context.go('/login', extra: _emailController.text.trim());
     } else if (vm.snackbarMessage != null) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(vm.snackbarMessage!)));
@@ -242,7 +240,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           const SizedBox(height: 16),
                           const Text(
-                            '학습용 계정을 생성합니다. 회원 상태는 앱 재시작 시 초기화됩니다.',
+                            '실제 MovieLog 계정을 생성합니다. 가입 후 이메일과 비밀번호로 로그인해 주세요.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xFF7B7786),
