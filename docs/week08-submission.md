@@ -97,13 +97,13 @@ flutter test tool/capture_week08.dart
 ## 제출 전 남은 외부 작업
 
 - 개인 계정으로 앱에 로그인하여 실제 서버와 통신하는 로그인→프로필→평점 CRUD 영상을 촬영합니다. 현재 영상은 FIXTURE 재현입니다.
-- 브랜치를 push하고 PR 링크를 입력합니다.
+- PR: https://github.com/kiwi13ird/movieLog/pull/9 (`week08` → `Week07`, 선행 PR #8 병합 후 main으로 변경).
 - 개인 Notion 미션 페이지에 구현/증거를 정리하고 UMC에 제출합니다. 이 작업에서는 외부 페이지나 제출 계정을 수정하지 않았습니다.
 
 ## 제출 양식
 
 ```text
-PR 링크: 브랜치 push 후 작성
+PR 링크: https://github.com/kiwi13ird/movieLog/pull/9
 로그인→GET me: live-api-checks.json + 개인 계정 앱 영상 첨부
 재시작 / 로그아웃 / 만료: Android FIXTURE 동작 영상 + 개인 계정 영상 첨부
 닉네임 수정: 실제 REST 검증 + FIXTURE 화면 04/05
